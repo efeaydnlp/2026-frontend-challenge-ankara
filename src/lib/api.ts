@@ -1,6 +1,7 @@
 import {
   normalizeCheckins,
   normalizeMessages,
+  normalizeNotes,
   normalizeSightings,
 } from "./normalize";
 
@@ -146,6 +147,53 @@ export async function fetchMessagesCheckinsAndSightings() {
   ];
 
   console.log("COMBINED 3 SOURCES:", combined);
+
+  return combined;
+}
+
+export async function fetchNotesOnly() {
+  const notes = await getFormSubmissions(FORM_IDS.notes);
+
+  console.log("NOTES RAW:", notes);
+
+  if (notes.length > 0) {
+    const first = notes[0] as { answers?: Record<string, JotformAnswer> };
+
+    console.log("FIRST NOTE OBJECT:", first);
+    console.log("FIRST NOTE ANSWERS:", first.answers);
+
+    const flattenedAnswers = Object.entries(first.answers ?? {}).map(
+      ([questionId, answer]) => ({
+        questionId,
+        name: answer.name,
+        text: answer.text,
+        type: answer.type,
+        answer: answer.answer,
+      })
+    );
+
+    console.log("FIRST NOTE ANSWERS FLATTENED:", flattenedAnswers);
+  }
+
+  return notes;
+}
+
+export async function fetchFourSources() {
+  const [messages, checkins, sightings, notes] = await Promise.all([
+    getFormSubmissions(FORM_IDS.messages),
+    getFormSubmissions(FORM_IDS.checkins),
+    getFormSubmissions(FORM_IDS.sightings),
+    getFormSubmissions(FORM_IDS.notes),
+  ]);
+
+  const combined = [
+    ...normalizeMessages(messages),
+    ...normalizeCheckins(checkins),
+    ...normalizeSightings(sightings),
+    ...normalizeNotes(notes),
+  ];
+
+  console.log("COMBINED 4 SOURCES:", combined);
 
   return combined;
 }

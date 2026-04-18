@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchMessagesCheckinsAndSightings } from "../lib/api";
+import { fetchFourSources } from "../lib/api";
 
 function DashboardPage() {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["messages-checkins-sightings"],
-    queryFn: fetchMessagesCheckinsAndSightings,
+    queryKey: ["four-sources"],
+    queryFn: fetchFourSources,
   });
 
   if (isLoading) {
-    return <div style={{ padding: 24 }}>Loading 3 sources...</div>;
+    return <div style={{ padding: 24 }}>Loading 4 sources...</div>;
   }
 
   if (isError) {
@@ -21,11 +21,11 @@ function DashboardPage() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h1>Combined 3 sources loaded</h1>
+      <h1>Combined 4 sources loaded</h1>
       <p>Count: {Array.isArray(data) ? data.length : 0}</p>
 
       <pre style={{ marginTop: 16, whiteSpace: "pre-wrap" }}>
-        {JSON.stringify(data?.slice(0, 5), null, 2)}
+        {JSON.stringify(data?.slice(0, 6), null, 2)}
       </pre>
     </div>
   );

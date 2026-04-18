@@ -111,3 +111,36 @@ export function normalizeSightings(
     };
   });
 }
+
+function splitPeople(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+export function normalizeNotes(
+  submissions: JotformSubmission[]
+): UnifiedRecord[] {
+  return submissions.map((submission) => {
+    const authorName = getAnswerValue(submission.answers, "authorName");
+    const timestamp =
+      getAnswerValue(submission.answers, "timestamp") || submission.created_at || "";
+    const location = getAnswerValue(submission.answers, "location");
+    const coordinates = getAnswerValue(submission.answers, "coordinates");
+    const note = getAnswerValue(submission.answers, "note");
+    const mentionedPeople = getAnswerValue(submission.answers, "mentionedPeople");
+
+    return {
+      id: submission.id,
+      type: "note",
+      title: `${authorName} note`,
+      content: note,
+      timestamp,
+      location,
+      coordinates,
+      personNames: [authorName, ...splitPeople(mentionedPeople)].filter(Boolean),
+      raw: submission,
+    };
+  });
+}
