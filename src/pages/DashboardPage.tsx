@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import EmptyState from "../components/common/EmptyState";
+import ErrorState from "../components/common/ErrorState";
+import LoadingState from "../components/common/LoadingState";
 import SearchInput from "../components/common/SearchInput";
 import FilterBar from "../components/investigation/FilterBar";
 import DetailPanel from "../components/investigation/DetailPanel";
@@ -7,7 +10,7 @@ import PersonList from "../components/investigation/PersonList";
 import RecordTimeline from "../components/investigation/RecordTimeline";
 import AppShell from "../components/layout/AppShell";
 import Panel from "../components/layout/Panel";
-import { people, summary, timelineRecords } from "../lib/mockData";
+import { fetchInvestigationData } from "../lib/api";
 
 const filterOptions = [
   { label: "All", value: "all" },
@@ -19,9 +22,16 @@ const filterOptions = [
 function DashboardPage() {
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(
-    people[0]?.id ?? null,
-  );
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["investigation-data"],
+    queryFn: fetchInvestigationData,
+  });
+
+  const people = data?.people ?? [];
+  const records = data?.records ?? [];
+  const summary = data?.summary ?? null;
 
   const filteredPeople = useMemo(() => {
     let result = people.filter((person) =>
@@ -43,20 +53,23 @@ function DashboardPage() {
     }
 
     return result;
-  }, [search, activeFilter]);
+  }, [people, search, activeFilter]);
+
+  const effectiveSelectedPersonId =
+    selectedPersonId ?? filteredPeople[0]?.id ?? people[0]?.id ?? null;
 
   const selectedPerson =
-    filteredPeople.find((person) => person.id === selectedPersonId) ??
-    people.find((person) => person.id === selectedPersonId) ??
+    filteredPeople.find((person) => person.id === effectiveSelectedPersonId) ??
+    people.find((person) => person.id === effectiveSelectedPersonId) ??
     null;
 
   const relatedRecords = useMemo(() => {
-    if (!selectedPersonId) return [];
+    if (!effectiveSelectedPersonId) return [];
 
-    return timelineRecords.filter((record) =>
-      record.personIds.includes(selectedPersonId),
+    return records.filter((record) =>
+      record.personIds.includes(effectiveSelectedPersonId),
     );
-  }, [selectedPersonId]);
+  }, [records, effectiveSelectedPersonId]);
 
   return (
     <AppShell>
@@ -92,17 +105,27 @@ function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="xl:col-span-3">
           <Panel title="People">
-            <PersonList
-              people={filteredPeople}
-              selectedPersonId={selectedPersonId}
-              onSelectPerson={setSelectedPersonId}
-            />
+            {isLoading ? (
+              <LoadingState lines={4} />
+            ) : isError ? (
+              <ErrorState description="Failed to load people records." />
+            ) : (
+              <PersonList
+                people={filteredPeople}
+                selectedPersonId={effectiveSelectedPersonId}
+                onSelectPerson={setSelectedPersonId}
+              />
+            )}
           </Panel>
         </div>
 
         <div className="xl:col-span-6">
           <Panel title="Timeline">
-            {selectedPerson ? (
+            {isLoading ? (
+              <LoadingState lines={5} />
+            ) : isError ? (
+              <ErrorState description="Failed to load timeline records." />
+            ) : selectedPerson ? (
               <RecordTimeline records={relatedRecords} />
             ) : (
               <EmptyState
@@ -116,28 +139,45 @@ function DashboardPage() {
         <div className="xl:col-span-3">
           <div className="space-y-4">
             <Panel title="Summary">
-              <div className="space-y-3 text-sm">
-                <div className="rounded-xl bg-amber-50 p-3">
-                  <p className="font-semibold text-amber-800">
-                    Most suspicious
-                  </p>
-                  <p className="mt-1 text-amber-700">
-                    {summary.mostSuspicious}
-                  </p>
-                </div>
+              {isLoading ? (
+                <LoadingState lines={2} />
+              ) : isError ? (
+                <ErrorState description="Failed to load investigation summary." />
+              ) : summary ? (
+                <div className="space-y-3 text-sm">
+                  <div className="rounded-xl bg-amber-50 p-3">
+                    <p className="font-semibold text-amber-800">
+                      Most suspicious
+                    </p>
+                    <p className="mt-1 text-amber-700">
+                      {summary.mostSuspicious}
+                    </p>
+                  </div>
 
-                <div className="rounded-xl bg-sky-50 p-3">
-                  <p className="font-semibold text-sky-800">Last seen with</p>
-                  <p className="mt-1 text-sky-700">{summary.lastSeenWith}</p>
+                  <div className="rounded-xl bg-sky-50 p-3">
+                    <p className="font-semibold text-sky-800">Last seen with</p>
+                    <p className="mt-1 text-sky-700">{summary.lastSeenWith}</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <EmptyState
+                  title="No summary available"
+                  description="Summary insights will appear here when data is ready."
+                />
+              )}
             </Panel>
 
             <Panel title="Details">
-              <DetailPanel
-                person={selectedPerson}
-                relatedRecords={relatedRecords}
-              />
+              {isLoading ? (
+                <LoadingState lines={3} />
+              ) : isError ? (
+                <ErrorState description="Failed to load selected person details." />
+              ) : (
+                <DetailPanel
+                  person={selectedPerson}
+                  relatedRecords={relatedRecords}
+                />
+              )}
             </Panel>
           </div>
         </div>
