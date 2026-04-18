@@ -3,6 +3,7 @@ import {
   normalizeMessages,
   normalizeNotes,
   normalizeSightings,
+  normalizeTips,
 } from "./normalize";
 
 const API_KEY = import.meta.env.VITE_JOTFORM_API_KEY;
@@ -194,6 +195,55 @@ export async function fetchFourSources() {
   ];
 
   console.log("COMBINED 4 SOURCES:", combined);
+
+  return combined;
+}
+
+export async function fetchTipsOnly() {
+  const tips = await getFormSubmissions(FORM_IDS.tips);
+
+  console.log("TIPS RAW:", tips);
+
+  if (tips.length > 0) {
+    const first = tips[0] as { answers?: Record<string, JotformAnswer> };
+
+    console.log("FIRST TIP OBJECT:", first);
+    console.log("FIRST TIP ANSWERS:", first.answers);
+
+    const flattenedAnswers = Object.entries(first.answers ?? {}).map(
+      ([questionId, answer]) => ({
+        questionId,
+        name: answer.name,
+        text: answer.text,
+        type: answer.type,
+        answer: answer.answer,
+      })
+    );
+
+    console.log("FIRST TIP ANSWERS FLATTENED:", flattenedAnswers);
+  }
+
+  return tips;
+}
+
+export async function fetchAllSources() {
+  const [messages, checkins, sightings, notes, tips] = await Promise.all([
+    getFormSubmissions(FORM_IDS.messages),
+    getFormSubmissions(FORM_IDS.checkins),
+    getFormSubmissions(FORM_IDS.sightings),
+    getFormSubmissions(FORM_IDS.notes),
+    getFormSubmissions(FORM_IDS.tips),
+  ]);
+
+  const combined = [
+    ...normalizeMessages(messages),
+    ...normalizeCheckins(checkins),
+    ...normalizeSightings(sightings),
+    ...normalizeNotes(notes),
+    ...normalizeTips(tips),
+  ];
+
+  console.log("ALL NORMALIZED SOURCES:", combined);
 
   return combined;
 }

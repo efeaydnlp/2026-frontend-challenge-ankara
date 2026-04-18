@@ -144,3 +144,30 @@ export function normalizeNotes(
     };
   });
 }
+
+export function normalizeTips(
+  submissions: JotformSubmission[]
+): UnifiedRecord[] {
+  return submissions.map((submission) => {
+    const timestamp =
+      getAnswerValue(submission.answers, "timestamp") || submission.created_at || "";
+    const location = getAnswerValue(submission.answers, "location");
+    const coordinates = getAnswerValue(submission.answers, "coordinates");
+    const suspectName = getAnswerValue(submission.answers, "suspectName");
+    const tip = getAnswerValue(submission.answers, "tip");
+    const confidence = getAnswerValue(submission.answers, "confidence");
+
+    return {
+      id: submission.id,
+      type: "tip",
+      title: suspectName ? `Tip about ${suspectName}` : "Anonymous tip",
+      content: tip,
+      timestamp,
+      location,
+      coordinates,
+      personNames: [suspectName].filter(Boolean),
+      urgency: confidence,
+      raw: submission,
+    };
+  });
+}
