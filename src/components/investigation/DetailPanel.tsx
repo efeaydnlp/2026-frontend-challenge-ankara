@@ -1,12 +1,17 @@
-import type { Person, TimelineRecord } from "../../types/investigation";
+import type { DashboardPerson, UnifiedRecord } from "../../types/investigation";
 import EmptyState from "../common/EmptyState";
 
 type DetailPanelProps = {
-  person: Person | null;
-  relatedRecords: TimelineRecord[];
+  person: DashboardPerson | null;
+  relatedRecords: UnifiedRecord[];
+  suspiciousScore: number;
 };
 
-function DetailPanel({ person, relatedRecords }: DetailPanelProps) {
+function DetailPanel({
+  person,
+  relatedRecords,
+  suspiciousScore,
+}: DetailPanelProps) {
   if (!person) {
     return (
       <EmptyState
@@ -47,6 +52,15 @@ function DetailPanel({ person, relatedRecords }: DetailPanelProps) {
           Linked Records
         </p>
         <p className="mt-1 text-slate-800">{relatedRecords.length}</p>
+      </div>
+
+      <div className="rounded-xl bg-amber-50 p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+          Suspicious Score
+        </p>
+        <p className="mt-1 text-lg font-semibold text-amber-800">
+          {suspiciousScore}
+        </p>
       </div>
     </div>
   );

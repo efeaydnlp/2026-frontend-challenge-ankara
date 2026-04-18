@@ -1,9 +1,9 @@
-import type { Person } from "../../types/investigation";
+import type { DashboardPerson } from "../../types/investigation";
 import EmptyState from "../common/EmptyState";
 import PersonCard from "./PersonCard";
 
 type PersonListProps = {
-  people: Person[];
+  people: DashboardPerson[];
   selectedPersonId: string | null;
   onSelectPerson: (personId: string) => void;
 };

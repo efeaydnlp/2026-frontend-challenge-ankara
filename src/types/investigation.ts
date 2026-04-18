@@ -35,3 +35,11 @@ export type UnifiedRecord = {
   urgency?: string;
   raw: unknown;
 };
+
+export type DashboardPerson = {
+  id: string;
+  name: string;
+  note: string;
+  riskLevel: "low" | "medium" | "high";
+  lastSeen?: string;
+};

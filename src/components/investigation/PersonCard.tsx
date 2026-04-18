@@ -1,7 +1,7 @@
-import type { Person } from "../../types/investigation";
+import type { DashboardPerson } from "../../types/investigation";
 
 type PersonCardProps = {
-  person: Person;
+  person: DashboardPerson;
   isSelected: boolean;
   onClick: () => void;
 };

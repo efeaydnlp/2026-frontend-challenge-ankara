@@ -11,7 +11,9 @@ function Panel({ title, children, className = "" }: PanelProps) {
     >
       {title ? (
         <div className="border-b border-slate-100 px-4 py-3">
-          <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {title}
+          </h2>
         </div>
       ) : null}
 

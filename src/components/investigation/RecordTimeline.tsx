@@ -1,9 +1,9 @@
-import type { TimelineRecord } from "../../types/investigation";
+import type { UnifiedRecord } from "../../types/investigation";
 import EmptyState from "../common/EmptyState";
 import TimelineItem from "./TimelineItem";
 
 type RecordTimelineProps = {
-  records: TimelineRecord[];
+  records: UnifiedRecord[];
 };
 
 function RecordTimeline({ records }: RecordTimelineProps) {
