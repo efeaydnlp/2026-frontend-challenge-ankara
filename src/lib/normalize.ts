@@ -58,3 +58,28 @@ export function normalizeMessages(
     };
   });
 }
+
+export function normalizeCheckins(
+  submissions: JotformSubmission[]
+): UnifiedRecord[] {
+  return submissions.map((submission) => {
+    const personName = getAnswerValue(submission.answers, "personName");
+    const timestamp =
+      getAnswerValue(submission.answers, "timestamp") || submission.created_at || "";
+    const location = getAnswerValue(submission.answers, "location");
+    const coordinates = getAnswerValue(submission.answers, "coordinates");
+    const note = getAnswerValue(submission.answers, "note");
+
+    return {
+      id: submission.id,
+      type: "checkin",
+      title: `${personName} checked in`,
+      content: note,
+      timestamp,
+      location,
+      coordinates,
+      personNames: [personName].filter(Boolean),
+      raw: submission,
+    };
+  });
+}

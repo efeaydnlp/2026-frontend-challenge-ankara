@@ -1,4 +1,4 @@
-import { normalizeMessages } from "./normalize";
+import { normalizeCheckins, normalizeMessages } from "./normalize";
 
 const API_KEY = import.meta.env.VITE_JOTFORM_API_KEY;
 const BASE_URL = import.meta.env.VITE_JOTFORM_BASE_URL || "https://api.jotform.com";
@@ -52,4 +52,47 @@ export async function fetchMessagesOnly() {
 
   console.log("MESSAGES NORMALIZED:", normalized);
   return normalized;
+}
+
+export async function fetchCheckinsOnly() {
+  const checkins = await getFormSubmissions(FORM_IDS.checkins);
+
+  console.log("CHECKINS RAW:", checkins);
+
+  if (checkins.length > 0) {
+    const first = checkins[0] as { answers?: Record<string, JotformAnswer> };
+
+    console.log("FIRST CHECKIN OBJECT:", first);
+    console.log("FIRST CHECKIN ANSWERS:", first.answers);
+
+    const flattenedAnswers = Object.entries(first.answers ?? {}).map(
+      ([questionId, answer]) => ({
+        questionId,
+        name: answer.name,
+        text: answer.text,
+        type: answer.type,
+        answer: answer.answer,
+      })
+    );
+
+    console.log("FIRST CHECKIN ANSWERS FLATTENED:", flattenedAnswers);
+  }
+
+  return checkins;
+}
+
+export async function fetchMessagesAndCheckins() {
+  const [messages, checkins] = await Promise.all([
+    getFormSubmissions(FORM_IDS.messages),
+    getFormSubmissions(FORM_IDS.checkins),
+  ]);
+
+  const normalizedMessages = normalizeMessages(messages);
+  const normalizedCheckins = normalizeCheckins(checkins);
+
+  const combined = [...normalizedMessages, ...normalizedCheckins];
+
+  console.log("COMBINED RECORDS:", combined);
+
+  return combined;
 }
