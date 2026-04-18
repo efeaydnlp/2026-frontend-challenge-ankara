@@ -1,7 +1,46 @@
+import { useMemo, useState } from "react";
 import AppShell from "../components/layout/AppShell";
 import Panel from "../components/layout/Panel";
+import SearchInput from "../components/common/SearchInput";
+import FilterBar from "../components/investigation/FilterBar";
+
+const people = [
+  {
+    id: "1",
+    name: "Ayşe Kaya",
+    note: "Last seen near Kızılay",
+  },
+  {
+    id: "2",
+    name: "Mert Demir",
+    note: "Mentioned in anonymous tip",
+  },
+  {
+    id: "3",
+    name: "Selin Aras",
+    note: "Linked to two sightings",
+  },
+];
+
+const filterOptions = [
+  { label: "All", value: "all" },
+  { label: "High Risk", value: "high-risk" },
+  { label: "Recently Seen", value: "recent" },
+  { label: "Mentioned", value: "mentioned" },
+];
 
 function DashboardPage() {
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const filteredPeople = useMemo(() => {
+    return people.filter((person) =>
+      `${person.name} ${person.note}`
+        .toLowerCase()
+        .includes(search.toLowerCase()),
+    );
+  }, [search]);
+
   return (
     <AppShell>
       <div className="mb-6">
@@ -19,26 +58,33 @@ function DashboardPage() {
         </div>
       </div>
 
+      <div className="mb-4 flex flex-col gap-3">
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Search by person, clue, or note..."
+        />
+
+        <FilterBar
+          options={filterOptions}
+          activeValue={activeFilter}
+          onChange={setActiveFilter}
+        />
+      </div>
+
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="xl:col-span-3">
           <Panel title="People">
             <div className="space-y-3">
-              <div className="rounded-xl border border-slate-200 p-3">
-                <p className="font-medium">Ayşe Kaya</p>
-                <p className="text-sm text-slate-500">Last seen near Kızılay</p>
-              </div>
-              <div className="rounded-xl border border-slate-200 p-3">
-                <p className="font-medium">Mert Demir</p>
-                <p className="text-sm text-slate-500">
-                  Mentioned in anonymous tip
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-200 p-3">
-                <p className="font-medium">Selin Aras</p>
-                <p className="text-sm text-slate-500">
-                  Linked to two sightings
-                </p>
-              </div>
+              {filteredPeople.map((person) => (
+                <div
+                  key={person.id}
+                  className="rounded-xl border border-slate-200 p-3"
+                >
+                  <p className="font-medium">{person.name}</p>
+                  <p className="text-sm text-slate-500">{person.note}</p>
+                </div>
+              ))}
             </div>
           </Panel>
         </div>
@@ -109,6 +155,9 @@ function DashboardPage() {
                 </p>
                 <p>
                   This panel will later show record relationships and reasoning.
+                </p>
+                <p className="pt-2 text-xs uppercase tracking-wide text-slate-400">
+                  Active filter: {activeFilter}
                 </p>
               </div>
             </Panel>
