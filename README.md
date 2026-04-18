@@ -1,73 +1,118 @@
-# React + TypeScript + Vite
+# Jotform Frontend Challenge Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## User Information
+- **Name**: Efe Aydınalp
 
-Currently, two official plugins are available:
+## Project Description
+This project is an investigation dashboard built for the Jotform Frontend Challenge.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The application analyzes the “Missing Podo: The Ankara Case” by collecting data from multiple Jotform sources and transforming them into a unified investigation interface.
 
-## React Compiler
+Integrated sources:
+- Messages
+- Check-ins
+- Sightings
+- Personal Notes
+- Anonymous Tips
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+These sources are normalized into a shared record structure so the user can:
+- inspect a combined timeline
+- search and filter people
+- view related records for a selected person
+- analyze suspicious actors using a simple and explainable suspicious score
 
-## Expanding the ESLint configuration
+## Features
+- Multi-source Jotform API integration
+- Record normalization layer
+- Search and filtering
+- Person-based investigation flow
+- Related timeline records
+- Suspicious score calculation
+- Loading, empty, and error states
+- Responsive multi-panel dashboard
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Technical Stack
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- TanStack Query
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 1. Install dependencies
+`npm install`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 2. Create environment file
+Create a `.env.local` file in the project root and add:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+`VITE_JOTFORM_API_KEY=your_api_key_here`
+`VITE_JOTFORM_BASE_URL=https://api.jotform.com`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 3. Start development server
+`npm run dev`
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+After running the command, open the local development URL shown in the terminal.
+
+## How It Works
+The application fetches data from separate Jotform forms and normalizes them into one shared record format.
+
+Each record is converted into a unified structure that includes:
+- type
+- timestamp
+- location
+- related people
+- content
+- urgency/confidence when available
+
+This unified structure is then used to:
+- build the people list
+- generate the timeline
+- filter related records
+- calculate a suspicious score
+- support the investigation flow through the dashboard
+
+## How to Test
+After starting the project:
+
+1. Confirm that the dashboard loads data successfully from Jotform.
+2. Verify that the people list is populated on the left panel.
+3. Use the search input to filter people by name or note.
+4. Use the filter buttons to narrow down the people list.
+5. Click on a person in the list and verify that:
+   - the timeline updates with related records
+   - the details panel updates correctly
+   - the suspicious score is displayed
+6. Check that records from different sources appear correctly in the investigation flow.
+7. Confirm that loading, empty, and error states appear correctly when needed.
+
+## Technical Notes
+- Data is fetched from multiple Jotform forms.
+- Different form submissions are normalized into one shared format.
+- The suspicious score is heuristic-based and intentionally explainable.
+- Different record types contribute differently to the score.
+- The project focuses on making fragmented records easier to inspect and relate.
+
+## Challenge Note
+The purpose of this project is not only to fetch data, but to transform fragmented investigation data into a more usable and inspection-friendly interface.
+
+The main goal is to help the user identify meaningful relationships between people, locations, events, and suspicious signals in a simple but effective dashboard experience.
+
+# 🚀 Challenge Duyurusu
+
+## 📅 Tarih ve Saat
+Cumartesi günü başlama saatinden itibaren üç saattir.
+
+## 🎯 Challenge Konsepti
+Bu challenge'da, size özel hazırlanmış bir senaryo üzerine web uygulaması geliştirmeniz istenecektir. Challenge başlangıcında senaryo detayları paylaşılacaktır. Katılımcılar, verilen GitHub reposunu fork ederek kendi geliştirme ortamlarını oluşturacaklardır.
+
+## 📦 GitHub Reposu
+Challenge için kullanılacak repo: https://github.com/cemjotform/2026-frontend-challenge-ankara
+
+## 🛠️ Hazırlık Süreci
+1. GitHub reposunu fork edin
+2. Tercih ettiğiniz framework ile geliştirme ortamınızı hazırlayın
+3. Hazırladığınız setup'ı fork ettiğiniz repoya gönderin
+
+## 💡 Önemli Notlar
+- Katılımcılar kendi tercih ettikleri framework'leri kullanabilirler
