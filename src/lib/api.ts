@@ -1,4 +1,8 @@
-import { normalizeCheckins, normalizeMessages } from "./normalize";
+import {
+  normalizeCheckins,
+  normalizeMessages,
+  normalizeSightings,
+} from "./normalize";
 
 const API_KEY = import.meta.env.VITE_JOTFORM_API_KEY;
 const BASE_URL = import.meta.env.VITE_JOTFORM_BASE_URL || "https://api.jotform.com";
@@ -93,6 +97,55 @@ export async function fetchMessagesAndCheckins() {
   const combined = [...normalizedMessages, ...normalizedCheckins];
 
   console.log("COMBINED RECORDS:", combined);
+
+  return combined;
+}
+
+export async function fetchSightingsOnly() {
+  const sightings = await getFormSubmissions(FORM_IDS.sightings);
+
+  console.log("SIGHTINGS RAW:", sightings);
+
+  if (sightings.length > 0) {
+    const first = sightings[0] as { answers?: Record<string, JotformAnswer> };
+
+    console.log("FIRST SIGHTING OBJECT:", first);
+    console.log("FIRST SIGHTING ANSWERS:", first.answers);
+
+    const flattenedAnswers = Object.entries(first.answers ?? {}).map(
+      ([questionId, answer]) => ({
+        questionId,
+        name: answer.name,
+        text: answer.text,
+        type: answer.type,
+        answer: answer.answer,
+      })
+    );
+
+    console.log("FIRST SIGHTING ANSWERS FLATTENED:", flattenedAnswers);
+  }
+
+  return sightings;
+}
+
+export async function fetchMessagesCheckinsAndSightings() {
+  const [messages, checkins, sightings] = await Promise.all([
+    getFormSubmissions(FORM_IDS.messages),
+    getFormSubmissions(FORM_IDS.checkins),
+    getFormSubmissions(FORM_IDS.sightings),
+  ]);
+
+  const normalizedMessages = normalizeMessages(messages);
+  const normalizedCheckins = normalizeCheckins(checkins);
+  const normalizedSightings = normalizeSightings(sightings);
+
+  const combined = [
+    ...normalizedMessages,
+    ...normalizedCheckins,
+    ...normalizedSightings,
+  ];
+
+  console.log("COMBINED 3 SOURCES:", combined);
 
   return combined;
 }

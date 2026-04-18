@@ -83,3 +83,31 @@ export function normalizeCheckins(
     };
   });
 }
+
+export function normalizeSightings(
+  submissions: JotformSubmission[]
+): UnifiedRecord[] {
+  return submissions.map((submission) => {
+    const personName = getAnswerValue(submission.answers, "personName");
+    const seenWith = getAnswerValue(submission.answers, "seenWith");
+    const timestamp =
+      getAnswerValue(submission.answers, "timestamp") || submission.created_at || "";
+    const location = getAnswerValue(submission.answers, "location");
+    const coordinates = getAnswerValue(submission.answers, "coordinates");
+    const note = getAnswerValue(submission.answers, "note");
+
+    return {
+      id: submission.id,
+      type: "sighting",
+      title: seenWith
+        ? `${personName} seen with ${seenWith}`
+        : `${personName} sighting`,
+      content: note,
+      timestamp,
+      location,
+      coordinates,
+      personNames: [personName, seenWith].filter(Boolean),
+      raw: submission,
+    };
+  });
+}
