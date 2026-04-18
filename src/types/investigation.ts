@@ -22,3 +22,16 @@ export type InvestigationSummary = {
   mostSuspicious: string;
   lastSeenWith: string;
 };
+
+export type UnifiedRecord = {
+  id: string;
+  type: RecordType;
+  title: string;
+  content: string;
+  timestamp?: string;
+  location?: string;
+  coordinates?: string;
+  personNames: string[];
+  urgency?: string;
+  raw: unknown;
+};
